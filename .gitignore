@@ -1,2 +1,3 @@
-/bin/
-/target/
+/config/dao.properties
+/config/mail.properties
+/logs

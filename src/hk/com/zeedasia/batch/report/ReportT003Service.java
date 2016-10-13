@@ -30,16 +30,22 @@ public class ReportT003Service {
 
 	private Properties prop;
 	private MailSender sender;
-	private String message;
+	private String messageSystem ="";
+	private String messageUser ="";
 	private List<String> errorList;
+	private String[] errorCodeList;
 	private boolean messageHeader = false;
+	private boolean mailToUser = false;
 
 	public ReportT003Service() throws IOException {
 		PropertiesUtils.loadLogProperties(BatchConstants.LOG_PROPERTIES_FILE);
 	}
 
 	public void start() throws IOException {
+		logger.info("ReprotT003Service Started");
 		prop = PropertiesUtils.getProperties(BatchConstants.CONFIG_PROPERTIES_FILE);
+		String errorCodes = prop.getProperty("errorSentUser").trim();
+		errorCodeList = errorCodes.split(";");
 		CheckError();
 	}
 
@@ -49,6 +55,7 @@ public class ReportT003Service {
 		AuditLogDao dao = new AuditLogDao(daoProp);
 		List<AuditLog> auditLogs = dao.getMOErrorLog(interval);
 		if (auditLogs.size() > 0) {
+			
 			getErrorList();
 			boolean exist;
 			for (AuditLog auditLog : auditLogs) {
@@ -61,20 +68,55 @@ public class ReportT003Service {
 				}
 				if (!exist) {
 					if (!messageHeader) {
-						message = BatchConstants.MESSAGE_HEADER;
+						messageSystem = BatchConstants.MESSAGE_HEADER;
 						messageHeader = true;
 					}
 					logger.info("Error Found: " + auditLog.toString());
 					DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 					String logDate = df.format(auditLog.getLogTimestamp());
-					message += "<tr><td>" + logDate + "</td><td>" + auditLog.getMessage() + "</td><td>"
+					messageSystem += "<tr><td>" + logDate + "</td><td>" + auditLog.getRefNo() + "</td><td>" + auditLog.getServerMessage() + "</td><td>"
 							+ auditLog.getId() + "</td></tr>";
 					addToErrorList(auditLog.getId());
+					String serverMessage = auditLog.getServerMessage().replace("\"", "'").trim();
+					for(String errorCode:errorCodeList){
+						if(serverMessage.contains(errorCode) && !errorCode.isEmpty()){
+							mailToUser = true;
+							messageUser += "<div><p><ul type=square>";
+							messageUser += "<li><u>Log Date: "+logDate+"; Error Message: "+auditLog.getServerMessage()+"</u>";
+							messageUser += "<ul type=circle>";
+							messageUser += "<li><b>Order Type: </b>"+auditLog.getOrderType()+"</li>";
+							messageUser += "<li><b>Reference No.: </b>"+auditLog.getRefNo()+"</li>";
+							messageUser += "<li><b>Account No.: </b>"+auditLog.getAccountNo()+"</li>";
+							messageUser += "<li><b>CAM ID: </b>"+auditLog.getCamId()+"</li>";
+							messageUser += "<li><b>AE Code: </b>"+auditLog.getAeCode()+"</li>";
+							messageUser += "<li><b>Product Code: </b>"+auditLog.getProductCode()+"</li>";
+							messageUser += "<li><b>Product Name: </b>"+auditLog.getProductName()+"</li>";
+							messageUser += "<li><b>CCY: </b>"+auditLog.getCcy()+"</li>";
+							messageUser += "<li><b>Settle CCY: </b>"+auditLog.getSettleCcy()+"</li>";
+							messageUser += "<li><b>Amount: </b>"+auditLog.getAmount()+"</li>";
+							messageUser += "<li><b>FO Fee: </b>"+auditLog.getFoFee()+"</li>";
+							messageUser += "<li><b>Switch Fee: </b>"+auditLog.getSwitchFee()+"</li>";
+							messageUser += "<li><b>Payment Method: </b>"+auditLog.getPaymentMethod()+"</li>";
+							messageUser += "<li><b>Bank Code: </b>"+auditLog.getBankCode()+"</li>";
+							messageUser += "<li><b>Bank Acct: </b>"+auditLog.getBankAcctNo()+"</li>";
+							messageUser += "<li><b>Approve Date: </b>"+auditLog.getArrpove_date()+"</li>";
+							messageUser += "</ul></li></ul></p></div>";
+							break;
+						}
+					}
+					
 				}
 			}
 		}
 		if (messageHeader) {
-			sendEmail();
+			Properties mailProp = PropertiesUtils.getProperties(BatchConstants.MAIL_PROPERTIES_FILE);	
+			String templateFile = mailProp.getProperty(BatchConstants.PROP_MAIL_TEMPLATE);
+			String to = mailProp.getProperty(BatchConstants.PROP_MAIL_SYSTEM);
+			sendEmail(to, messageSystem, templateFile);
+			if(mailToUser){
+				to = mailProp.getProperty(BatchConstants.PROP_MAIL_USER);
+				sendEmail(to, messageUser,templateFile);
+			}
 		} else {
 			logger.info("No Error Found.");
 		}
@@ -92,6 +134,7 @@ public class ReportT003Service {
 	}
 
 	private void addToErrorList(String logID) {
+		logger.info("Add logID:"+logID+" into ErrorList File");
 		errorList.add(logID);
 		String errorFile = prop.getProperty(BatchConstants.ERROR_FILE_PATH)
 				+ prop.getProperty(BatchConstants.ERROR_FILE_NAME);
@@ -108,12 +151,8 @@ public class ReportT003Service {
 		}
 	}
 
-	private void sendEmail() throws IOException {
-		Properties mailProp = PropertiesUtils.getProperties(BatchConstants.MAIL_PROPERTIES_FILE);
-		String to = mailProp.getProperty(BatchConstants.PROP_MAIL_TO);
-		String templateFilePath = mailProp.getProperty(BatchConstants.PROP_MAIL_TEMPLATE);
-		File templateFile = new File(templateFilePath);
-
+	private void sendEmail(String to, String message, String Template) {
+		File templateFile = new File(Template);
 		MailTemplate template = MailTemplateLoader.load(templateFile);
 		String subject = template.getSubject();
 		subject = subject.replace("${date}", getDateStr());
@@ -129,10 +168,11 @@ public class ReportT003Service {
 			sender.sendHtml(to, subject, content);
 			sender.close();
 			logger.info("Email sent to: " + to);
-		} catch (MessagingException | MailException e) {
+		} catch (Exception e) {
 			logger.info("Exception while sending email: " + e.getMessage());
 		}
 	}
+	
 
 	private String getDateStr() {
 		Calendar cal = Calendar.getInstance();
