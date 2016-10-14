@@ -82,13 +82,21 @@ public class ReportT003Service {
 						if(serverMessage.contains(errorCode) && !errorCode.isEmpty()){
 							mailToUser = true;
 							messageUser += "<div><p><ul type=square>";
-							messageUser += "<li><u>Log Date: "+logDate+"; Error Message: "+auditLog.getServerMessage()+"</u>";
+							messageUser += "<li><u>Log Date: "+logDate+"; Error Message: "+auditLog.getServerMessage()+"</u></li>";
 							messageUser += "<ul type=circle>";
 							messageUser += "<li><b>Order Type: </b>"+auditLog.getOrderType()+"</li>";
 							messageUser += "<li><b>Reference No.: </b>"+auditLog.getRefNo()+"</li>";
+							String inputDate = df.format(auditLog.getCreateDate());
+							messageUser += "<li><b>Input Date.: </b>"+inputDate+"</li>";
 							messageUser += "<li><b>Account No.: </b>"+auditLog.getAccountNo()+"</li>";
 							messageUser += "<li><b>CAM ID: </b>"+auditLog.getCamId()+"</li>";
+							messageUser += "<li><b>Account Name: </b>"+auditLog.getAccountName()+"</li>";
+							messageUser += "<li><b>Account Email: </b>"+auditLog.getClientEmail()+"</li>";
+							messageUser += "<li><b>Account Tel: </b>"+auditLog.getClientTel()+"</li>";
 							messageUser += "<li><b>AE Code: </b>"+auditLog.getAeCode()+"</li>";
+							messageUser += "<li><b>AE Name: </b>"+auditLog.getAeName()+"</li>";
+							messageUser += "<li><b>AE Email: </b>"+auditLog.getAeEmail()+"</li>";
+							messageUser += "<li><b>AE Tel: </b>"+auditLog.getAeTel()+"</li>";
 							messageUser += "<li><b>Product Code: </b>"+auditLog.getProductCode()+"</li>";
 							messageUser += "<li><b>Product Name: </b>"+auditLog.getProductName()+"</li>";
 							messageUser += "<li><b>CCY: </b>"+auditLog.getCcy()+"</li>";
@@ -100,7 +108,7 @@ public class ReportT003Service {
 							messageUser += "<li><b>Bank Code: </b>"+auditLog.getBankCode()+"</li>";
 							messageUser += "<li><b>Bank Acct: </b>"+auditLog.getBankAcctNo()+"</li>";
 							messageUser += "<li><b>Approve Date: </b>"+auditLog.getArrpove_date()+"</li>";
-							messageUser += "</ul></li></ul></p></div>";
+							messageUser += "</ul></ul></p></div>";
 							break;
 						}
 					}

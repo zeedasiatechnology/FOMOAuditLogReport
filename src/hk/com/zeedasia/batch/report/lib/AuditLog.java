@@ -1,19 +1,27 @@
 package hk.com.zeedasia.batch.report.lib;
 
 import java.math.BigDecimal;
+import java.security.Timestamp;
 import java.util.Date;
 
 public class AuditLog {
 	private String id;
 	private Date logDate;
 	private BigDecimal logTimestamp;
+	private Date createDate;
 	private String refNo;
 	private String serverMessage;
 	private String orderType;
 	private int extRefNo;
 	private String accountNo;
+	private String accountName;
+	private String clientEmail;
+	private String clientTel;
 	private String camId;
 	private String aeCode;
+	private String aeName;
+	private String aeEmail;
+	private String aeTel;
 	private String productCode;
 	private String productName;
 	private String ccy;
@@ -25,7 +33,7 @@ public class AuditLog {
 	private String bankCode;
 	private String bankAcctNo;
 	private String approve_ref_no;
-	private String arrpove_date;
+	private Date arrpove_date;
 
 	public String getId() {
 		return id;
@@ -49,6 +57,14 @@ public class AuditLog {
 
 	public void setLogTimestamp(BigDecimal logTimestamp) {
 		this.logTimestamp = logTimestamp;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 	public String getRefNo() {
@@ -91,6 +107,30 @@ public class AuditLog {
 		this.accountNo = accountNo;
 	}
 
+	public String getAccountName() {
+		return accountName;
+	}
+
+	public void setAccountName(String accountName) {
+		this.accountName = accountName;
+	}
+
+	public String getClientEmail() {
+		return clientEmail;
+	}
+
+	public void setClientEmail(String clientEmail) {
+		this.clientEmail = clientEmail;
+	}
+
+	public String getClientTel() {
+		return clientTel;
+	}
+
+	public void setClientTel(String clientTel) {
+		this.clientTel = clientTel;
+	}
+
 	public String getCamId() {
 		return camId;
 	}
@@ -105,6 +145,30 @@ public class AuditLog {
 
 	public void setAeCode(String aeCode) {
 		this.aeCode = aeCode;
+	}
+
+	public String getAeName() {
+		return aeName;
+	}
+
+	public void setAeName(String aeName) {
+		this.aeName = aeName;
+	}
+
+	public String getAeEmail() {
+		return aeEmail;
+	}
+
+	public void setAeEmail(String aeEmail) {
+		this.aeEmail = aeEmail;
+	}
+
+	public String getAeTel() {
+		return aeTel;
+	}
+
+	public void setAeTel(String aeTel) {
+		this.aeTel = aeTel;
 	}
 
 	public String getProductCode() {
@@ -195,11 +259,11 @@ public class AuditLog {
 		this.approve_ref_no = approve_ref_no;
 	}
 
-	public String getArrpove_date() {
+	public Date getArrpove_date() {
 		return arrpove_date;
 	}
 
-	public void setArrpove_date(String arrpove_date) {
+	public void setArrpove_date(Date arrpove_date) {
 		this.arrpove_date = arrpove_date;
 	}
 
@@ -212,10 +276,17 @@ public class AuditLog {
 		sb.append("RefNo=" + refNo + ";");
 		sb.append("ServerMessage=" + serverMessage + ";");
 		sb.append("OrderType=" + orderType + ";");
+		sb.append("CreateDate=" + createDate + ";");
 		sb.append("ExtRefNo=" + extRefNo + ";");
 		sb.append("AccountNo=" + accountNo + ";");
 		sb.append("CamId=" + camId + ";");
+		sb.append("AccountName=" + accountName + ";");
+		sb.append("ClientEmail=" + clientEmail + ";");
+		sb.append("ClientTel=" + clientTel + ";");
 		sb.append("AeCode=" + aeCode + ";");
+		sb.append("AEName=" + aeName + ";");
+		sb.append("AEEmail=" + aeEmail + ";");
+		sb.append("AETel=" + aeTel + ";");
 		sb.append("ProductCode=" + productCode + ";");
 		sb.append("ProductName=" + productName + ";");
 		sb.append("CCY=" + ccy + ";");
