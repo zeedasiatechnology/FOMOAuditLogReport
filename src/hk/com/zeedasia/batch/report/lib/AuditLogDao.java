@@ -44,7 +44,7 @@ public class AuditLogDao extends Dao {
 			+ "and log.message like '%errorCode%' "
 			+ "and log.message not like '%errorCode\" : 0%' "
 			+ "and log.log_date >= date_sub(now(), INTERVAL  $[interval] ) "
-			+ "order by log_date asc";
+			+ "order by log.id, log.log_date asc ";
 
 	public AuditLogDao() {
 		super();

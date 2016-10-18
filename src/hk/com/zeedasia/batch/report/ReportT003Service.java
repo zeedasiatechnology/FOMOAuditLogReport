@@ -54,16 +54,18 @@ public class ReportT003Service {
 		String interval = prop.getProperty(BatchConstants.INTERVAL);
 		AuditLogDao dao = new AuditLogDao(daoProp);
 		List<AuditLog> auditLogs = dao.getMOErrorLog(interval);
-		if (auditLogs.size() > 0) {
-			
+		if (auditLogs.size() > 0) {	
 			getErrorList();
 			boolean exist;
+			String previousLogID = "";
 			for (AuditLog auditLog : auditLogs) {
 				exist = false;
-				for (String logID : errorList) {
-					if (auditLog.getId().equals(logID)) {
-						exist = true;
-						continue;
+				if(!auditLog.getId().equals(previousLogID)){
+					for (String logID : errorList) {
+						if (auditLog.getId().equals(logID)) {
+							exist = true;
+							continue;
+						}
 					}
 				}
 				if (!exist) {
@@ -76,7 +78,11 @@ public class ReportT003Service {
 					String logDate = df.format(auditLog.getLogTimestamp());
 					messageSystem += "<tr><td>" + logDate + "</td><td>" + auditLog.getRefNo() + "</td><td>" + auditLog.getServerMessage() + "</td><td>"
 							+ auditLog.getId() + "</td></tr>";
-					addToErrorList(auditLog.getId());
+					
+					if(!auditLog.getId().equals(previousLogID)){
+						addToErrorList(auditLog.getId());
+					}
+					
 					String serverMessage = auditLog.getServerMessage().replace("\"", "'").trim();
 					for(String errorCode:errorCodeList){
 						if(serverMessage.contains(errorCode) && !errorCode.isEmpty()){
@@ -114,6 +120,7 @@ public class ReportT003Service {
 					}
 					
 				}
+				previousLogID = auditLog.getId();
 			}
 		}
 		if (messageHeader) {
