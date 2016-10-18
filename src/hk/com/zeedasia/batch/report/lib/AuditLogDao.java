@@ -42,7 +42,7 @@ public class AuditLogDao extends Dao {
 			+ "where approvalTable.approve_date > DATE_SUB(now(), interval 1 YEAR) "
 			+ "AND log.sub_system ='IBOSS2-REST-API' "
 			+ "and log.message like '%errorCode%' "
-			+ "and log.message not like '%errorCode\": 0%' "
+			+ "and log.message not like '%errorCode\" : 0%' "
 			+ "and log.log_date >= date_sub(now(), INTERVAL  $[interval] ) "
 			+ "order by log_date asc";
 
